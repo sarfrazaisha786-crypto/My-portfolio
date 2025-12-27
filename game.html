@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Number Adventure Game</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #89f7fe, #66a6ff);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    justify-content: center;
+}
+
+h1 {
+    color: #004aad;
+    text-align: center;
+    margin-bottom: 1rem;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+}
+
+#gameContainer {
+    background: #fff;
+    width: 400px;
+    max-width: 90%;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    transition: all 0.3s;
+}
+
+#message {
+    font-size: 1.1rem;
+    color: #333;
+    text-align: center;
+    min-height: 60px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+#inputContainer { display:flex; gap:10px; margin-bottom:15px; }
+
+input[type="number"] {
+    padding:0.7rem;
+    font-size:1rem;
+    border-radius:12px;
+    border:2px solid #004aad;
+    width:90px;
+    text-align:center;
+}
+
+button {
+    padding:0.7rem 1.5rem;
+    border-radius:12px;
+    border:none;
+    background-color:#004aad;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    margin:0.5rem;
+    transition:all 0.3s;
+}
+
+button:hover { background-color:#003377; transform:translateY(-2px); }
+
+#stats { width:100%; display:flex; justify-content:space-between; margin-top:15px; font-weight:bold; color:#004aad; }
+
+#healthBar { background:#ddd; border-radius:10px; width:100px; height:15px; overflow:hidden; }
+#healthFill { background:#ff4d4d; height:100%; width:100%; transition:width 0.3s ease; }
+
+#items { display:flex; flex-wrap:wrap; gap:5px; justify-content:center; }
+
+.item { background-color:#004aad; color:white; padding:5px 10px; border-radius:15px; font-size:0.85rem; font-weight:bold; transition:transform 0.3s; }
+.item:hover { transform:scale(1.2); }
+
+#gameOver { display:none; color:red; font-weight:bold; margin-top:10px; font-size:1.2rem; text-align:center; }
+
+#leaderboardContainer { margin-top:15px; width:100%; }
+#leaderboardContainer h3 { color:#004aad; text-align:center; margin-bottom:5px; }
+#leaderboard { padding-left:20px; color:#004aad; }
+#leaderboard li { margin-bottom:3px; }
+
+.top1 { color: gold; font-weight: bold; }
+.top2 { color: silver; font-weight: bold; }
+.top3 { color: #cd7f32; font-weight: bold; }
+
+#newHighscore { display:none; color:#004aad; font-weight:bold; margin-top:10px; font-size:1.1rem; animation: pop 0.5s; text-align:center; }
+@keyframes pop { 0%{transform:scale(0);} 100%{transform:scale(1);} }
+
+canvas { position:absolute; top:0; left:0; pointer-events:none; z-index:1000; }
+</style>
+</head>
+<body>
+
+<h1>Number Adventure Game 🎲</h1>
+
+<div id="gameContainer">
+    <div id="message">Click Start to begin your adventure!</div>
+    
+    <div id="inputContainer" style="display:none;">
+        <input type="number" id="guessInput" min="1">
+        <button id="guessBtn">Guess</button>
+    </div>
+    
+    <div id="stats">
+        <div>Level: <span id="level">1</span></div>
+        <div>Score: <span id="score">0</span></div>
+        <div>
+            Health: 
+            <div id="healthBar">
+                <div id="healthFill"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="items"></div>
+    <div id="gameOver">Game Over! Press Restart to play again.</div>
+    <div id="newHighscore">🎉 New Highscore!</div>
+    
+    <div style="margin-top:10px;">
+        <button id="startBtn">Start Game</button>
+        <button id="restartBtn" style="display:none;">Restart Game</button>
+    </div>
+
+    <div id="leaderboardContainer">
+        <h3>Leaderboard 🏆</h3>
+        <ol id="leaderboard"></ol>
+    </div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<!-- Sound Effects -->
+<audio id="soundCorrect" src="https://freesound.org/data/previews/320/320655_5260873-lq.mp3"></audio>
+<audio id="soundWrong" src="https://freesound.org/data/previews/256/256113_3263906-lq.mp3"></audio>
+<audio id="soundLevelUp" src="https://freesound.org/data/previews/337/337049_3248244-lq.mp3"></audio>
+
+<script>
+let level = 1, score = 0, health = 3, items = [], numberToGuess = 1;
+let streak = 0; const maxHealth = 3;
+
+const message = document.getElementById("message");
+const guessInput = document.getElementById("guessInput");
+const guessBtn = document.getElementById("guessBtn");
+const levelDisplay = document.getElementById("level");
+const scoreDisplay = document.getElementById("score");
+const healthFill = document.getElementById("healthFill");
+const itemsDisplay = document.getElementById("items");
+const gameOverText = document.getElementById("gameOver");
+const startBtn = document.getElementById("startBtn");
+const restartBtn = document.getElementById("restartBtn");
+const inputContainer = document.getElementById("inputContainer");
+const leaderboardEl = document.getElementById("leaderboard");
+const newHighscoreEl = document.getElementById("newHighscore");
+
+const soundCorrect = document.getElementById("soundCorrect");
+const soundWrong = document.getElementById("soundWrong");
+const soundLevelUp = document.getElementById("soundLevelUp");
+
+// Leaderboard functions
+function updateLeaderboard() {
+    let leaderboard = JSON.parse(localStorage.getItem("numberGameLeaderboard")) || [];
+    leaderboard.sort((a,b)=>b.score-a.score);
+    leaderboard = leaderboard.slice(0,5);
+    leaderboardEl.innerHTML = "";
+    leaderboard.forEach((s, index) => {
+        const li = document.createElement("li");
+        li.textContent = `${s.name} - ${s.score} pts`;
+        if(index===0) li.classList.add("top1");
+        else if(index===1) li.classList.add("top2");
+        else if(index===2) li.classList.add("top3");
+        leaderboardEl.appendChild(li);
+    });
+}
+
+function saveScore(name){
+    if(score <= 0) return;
+    let leaderboard = JSON.parse(localStorage.getItem("numberGameLeaderboard")) || [];
+
+    // Check if player already exists
+    const existingPlayer = leaderboard.find(p => p.name === name);
+
+    if(existingPlayer){
+        // Update score only if new score is higher
+        if(score > existingPlayer.score){
+            existingPlayer.score = score;
+        }
+    } else {
+        // Add new player
+        leaderboard.push({name: name || "Player", score: score});
+    }
+
+    // Sort and keep top 5
+    leaderboard.sort((a,b)=>b.score-a.score);
+    leaderboard = leaderboard.slice(0,5);
+
+    localStorage.setItem("numberGameLeaderboard", JSON.stringify(leaderboard));
+    updateLeaderboard();
+
+    // Show confetti and highscore animation
+    newHighscoreEl.style.display = "block";
+    confettiBurst();
+    setTimeout(()=>{ newHighscoreEl.style.display="none"; }, 2500);
+}
+
+// Generate random number
+function generateNumber() {
+    numberToGuess = Math.floor(Math.random() * (5 + level*2)) + 1;
+}
+
+function updateStats() {
+    levelDisplay.textContent = level;
+    scoreDisplay.textContent = score;
+    healthFill.style.width = (health / maxHealth * 100) + "%";
+    itemsDisplay.innerHTML = items.map(i=>`<span class="item">${i}</span>`).join('');
+}
+
+// Confetti
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+let confettiParticles = [];
+function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+function confettiBurst(){
+    for(let i=0;i<150;i++){
+        confettiParticles.push({
+            x: Math.random()*canvas.width,
+            y: Math.random()*canvas.height/2,
+            r: Math.random()*6+4,
+            dx: (Math.random()-0.5)*5,
+            dy: Math.random()*5+2,
+            color: `hsl(${Math.random()*360}, 100%, 50%)`
+        });
+    }
+    animateConfetti();
+}
+
+function animateConfetti(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confettiParticles.forEach(p=>{
+        p.x += p.dx; p.y += p.dy; p.dy += 0.05;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fill();
+    });
+    confettiParticles = confettiParticles.filter(p=>p.y < canvas.height);
+    if(confettiParticles.length>0) requestAnimationFrame(animateConfetti);
+}
+
+// Check guess
+function checkGuess(){
+    const guess = parseInt(guessInput.value);
+    if(isNaN(guess) || guess < 1){ message.textContent="Enter a valid number!"; return;}
+    if(guess===numberToGuess){
+        streak++;
+        score += 10 * level * streak;
+        message.textContent = `Correct! Number was ${numberToGuess} 🎉 Streak x${streak}`;
+        soundCorrect.play();
+        if(Math.random() < 0.5){
+            const newItem = `Power-up ${items.length+1}`;
+            items.push(newItem);
+            message.textContent += ` You found ${newItem}!`;
+        }
+        level++;
+        soundLevelUp.play();
+        message.style.transform="scale(1.2)";
+        setTimeout(()=>{ message.style.transform="scale(1)"; },300);
+        generateNumber();
+    } else {
+        streak=0;
+        health--;
+        message.textContent = guess<numberToGuess ? "Too low! ⚠️":"Too high! ⚠️";
+        soundWrong.play();
+        if(health<=0) return endGame();
+    }
+    guessInput.value="";
+    guessInput.focus();
+    updateStats();
+}
+
+// Start game
+function startGame(){
+    level=1; score=0; health=maxHealth; items=[]; streak=0;
+    inputContainer.style.display="flex";
+    startBtn.style.display="none";
+    restartBtn.style.display="none";
+    gameOverText.style.display="none";
+    message.textContent = `Guess a number between 1 and ${5+level*2}`;
+    generateNumber();
+    updateStats();
+    guessInput.focus();
+}
+
+// End game
+function endGame(){
+    message.textContent="";
+    inputContainer.style.display="none";
+    gameOverText.style.display="block";
+    restartBtn.style.display="inline-block";
+
+    if(score>0){
+        let playerName = prompt("Game Over! Enter your name for the leaderboard:","Player");
+        if(playerName) saveScore(playerName);
+    }
+}
+
+// Restart game
+function restartGame(){ startGame(); }
+
+guessBtn.addEventListener("click", checkGuess);
+guessInput.addEventListener("keyup", e=>{ if(e.key==="Enter") checkGuess(); });
+startBtn.addEventListener("click", startGame);
+restartBtn.addEventListener("click", restartGame);
+
+updateLeaderboard();
+updateStats();
+</script>
+</body>
+</html>
