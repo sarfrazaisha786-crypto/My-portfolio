@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Portfolio</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+            transition: color 0.3s;
+        }
+
+        a:hover { color: #ffdd57; }
+
+        nav {
+            background-color: #007BFF;
+            padding: 1rem 0;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav a {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        section {
+            padding: 4rem 0;
+            width: 100%;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        #hero p {
+            font-size: 1.1rem;
+            color: #555;
+            text-align: center;
+        }
+
+        #hero img {
+            max-width: 100%;
+            display: block;
+            margin: 2rem auto 0 auto;
+            border-radius: 15px;
+        }
+
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .skill-badge {
+            background-color: #007BFF;
+            color: white;
+            padding: 0.7rem 1.3rem;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .skill-badge:hover { transform: scale(1.1); }
+
+        .projects-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .project-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .project-card a {
+            display: inline-block;
+            margin-top: 1rem;
+            background-color: #007BFF;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .project-card a:hover { background-color: #0056b3; }
+
+        #about, #contact {
+            background-color: #ffffff;
+            text-align: center;
+        }
+
+        #about p, #contact p {
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #1a1a1a;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+    <a href="#hero">Home</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+</nav>
+
+<!-- Hero Section -->
+<section id="hero">
+    <div class="container">
+        <h1>Hello, I'm Aisha Sarfraz 👋</h1>
+        <p>Teen developer learning Python and web development. I build websites, calculators, and games.</p>
+        <img src="https://share.google/A1bOlTvmNB7MzKYVq" alt="Coding Illustration">
+    </div>
+</section>
+
+<!-- Skills Section -->
+<section id="skills">
+    <div class="container">
+        <h2>My Skills</h2>
+        <div class="skills-container">
+            <span class="skill-badge">Python</span>
+            <span class="skill-badge">HTML</span>
+            <span class="skill-badge">CSS</span>
+            <span class="skill-badge">Web Development</span>
+            <span class="skill-badge">Game Development</span>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Section -->
+<section id="projects">
+    <div class="container">
+        <h2>Featured Projects</h2>
+        <div class="projects-container">
+
+            <div class="project-card">
+                <h3>Calculator</h3>
+                <p>A simple Python web calculator to perform basic operations.</p>
+                <a href="calculator.html">Open Calculator</a>
+            </div>
+
+            <div class="project-card">
+                <h3>Biology Quiz App</h3>
+                <p>Interactive biology quiz to test your knowledge with multiple choice questions.</p>
+                <a href="biology-quiz-app.html">Open Quiz</a>
+            </div>
+
+            <div class="project-card">
+                <h3>Number Adventure Game</h3>
+                <p>A fun number guessing game with levels, streaks, power-ups, and leaderboard.</p>
+                <a href="game.html">Play Game</a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- About Me Section -->
+<section id="about">
+    <div class="container">
+        <h2>About Me</h2>
+        <p>I enjoy building games, calculators, and web projects. I’m constantly learning new coding skills and love experimenting with Python and web technologies.</p>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact">
+    <div class="container">
+        <h2>Contact Me</h2>
+        <p>Email: <a href="mailto:sarfrazaisha786@gmail.com">sarfrazaisha786@gmail.com</a></p>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    &copy; 2025 Aisha Sarfraz. All rights reserved.
+</footer>
+
+</body>
+          </html>
